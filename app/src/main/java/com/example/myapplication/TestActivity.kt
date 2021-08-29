@@ -13,7 +13,6 @@ class TestActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<Button>(R.id.button).setText("I'm in test")
 
     }
 }
