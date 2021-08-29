@@ -15,8 +15,8 @@ object NewsUtil {
         val storyNumberIterator = "\\d+".toRegex().findAll(newsResponse).iterator()
 
         return flow<String> {
-            for (numberMatch in storyNumberIterator) {
-                val number = numberMatch.groupValues[0]
+            storyNumberIterator.forEach {
+                val number = it.groupValues[0]
                 emit(readerApiService.getStoryInformation(number).await())
             }
         }
