@@ -7,17 +7,19 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import com.com.example.newsreader.service.ApiService
 import com.com.example.newsreader.service.NewsUtil
 import com.com.example.newsreader.service.ReaderApiService
+import com.example.viewModel.NewViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onCompletion
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-import kotlin.lazy as lazy
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,11 +28,17 @@ class MainActivity : AppCompatActivity() {
             get() = Job() + Dispatchers.Main
     }
 
+    val newViewModel : NewViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         newsDialog()
+
+        newViewModel.newsLiveData.observe(this){
+            Log.d("News", it.toString())
+        }
 
         findViewById<Button>(R.id.button).setOnClickListener {
             startActivity(Intent(this, TestActivity::class.java))
@@ -42,12 +50,14 @@ class MainActivity : AppCompatActivity() {
             if (alertDialog("News Reader", "Do you want to retrieve news ?"))
                 launch {
                     val scope = this
+                    var newsList = mutableListOf<String>()
                     NewsUtil.getStoriesFlow().onCompletion {
                         scope.launch {
                             newsDialog()
                         }
                     }.collectLatest {
-                        Log.d("News", it)
+                        newsList.add(it)
+                        newViewModel.setNewsLiveData(newsList)
                     }
                 }
         }
