@@ -19,10 +19,6 @@ import kotlin.lazy as lazy
 
 class MainActivity : AppCompatActivity() {
 
-    val readerApiService : ReaderApiService by lazy {
-        ApiService.getReaderApiService()
-    }
-
     val myScope = object : CoroutineScope {
         override val coroutineContext: CoroutineContext
             get() = Job() + Dispatchers.Main
